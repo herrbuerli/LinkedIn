@@ -18,10 +18,10 @@
   const postSelector = '[role="listitem"][componentkey^="update-card-focus"]';
   // Word boundaries prevent matches inside words such as "Mail" or "Kinder".
   const aiTerms = /(?:\b(?:ki|ai|chatgpt|claude|anthropic|openai|gemini|copilot|llms?|midjourney|deepseek)\b|künstlich\w*\s+intelligenz|artificial\s+intelligence|generativ\w*\s+(?:ki|ai)|machine\s+learning|large\s+language\s+models?)/iu;
-  let showAiPosts = false;
+  let showAiPosts = true;
   let showAds = true;
   const adsStorageKey = 'linkedin-experiment-show-ads';
-  try { showAiPosts = localStorage.getItem(storageKey) === 'true'; } catch (_) { /* Storage is optional. */ }
+  try { showAiPosts = localStorage.getItem(storageKey) !== 'false'; } catch (_) { /* Storage is optional. */ }
   try { showAds = localStorage.getItem(adsStorageKey) !== 'false'; } catch (_) { /* Storage is optional. */ }
 
   function isAiPost(post) {
