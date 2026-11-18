@@ -1,0 +1,101 @@
+.aaal5q[componentkey="6b3a6ba1-b8de-4aae-aff1-30cb9f4446a6"] a:is(
+  [href="https://www.linkedin.com/company/effinger/"],
+  [href="https://www.linkedin.com/company/urbane-reformer-innen/"],
+  [href="https://www.linkedin.com/company/user-research-schweiz/"]
+) { display: none !important; }
+
+.ki-filter-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 34px 16px 16px;
+  border: 1px solid #dfdeda;
+  border-radius: 8px;
+  background: #fff;
+  color: #404040;
+  font-family: inherit;
+}
+.feed-filter-count {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: #777;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+.ki-filter-copy { flex: 1; min-width: 0; }
+.ki-filter-card h2 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.ki-filter-card p {
+  margin: 6px 0 0;
+  color: #777;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.ki-filter-switch {
+  appearance: none;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 24px;
+  padding: 3px;
+  border: 0;
+  border-radius: 24px;
+  background: #8c8c8c;
+  cursor: pointer;
+  transition: background .18s ease;
+}
+.ki-filter-switch span {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: transform .18s ease;
+}
+.ki-filter-switch[aria-checked="true"] { background: #0a66c2; }
+.ki-filter-switch[aria-checked="true"] span { transform: translateX(16px); }
+.ki-filter-switch:focus-visible { outline: 2px solid #0a66c2; outline-offset: 4px; }
+[data-ki-filter-hidden] { display: none !important; }
+.ki-term-highlight {
+  background: #ffeb80;
+  color: inherit;
+  font: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.ki-filter-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  z-index: 10000;
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+  padding: 14px 20px;
+  border-radius: 8px;
+  background: #0a66c2;
+  color: #fff;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 18%);
+  font: 400 14px/1.4 system-ui, sans-serif;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.ki-filter-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ki-filter-switch, .ki-filter-switch span, .ki-filter-toast { transition: none; }
+}
