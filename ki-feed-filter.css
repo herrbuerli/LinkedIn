@@ -64,6 +64,13 @@
 .ki-filter-switch[aria-checked="true"] span { transform: translateX(16px); }
 .ki-filter-switch:focus-visible { outline: 2px solid #0a66c2; outline-offset: 4px; }
 [data-ki-filter-hidden] { display: none !important; }
+.feed-filter-slot {
+  display: flow-root;
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+  overflow-anchor: none;
+}
 .ki-term-highlight {
   background: #ffeb80;
   color: inherit;

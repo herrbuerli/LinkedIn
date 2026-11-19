@@ -82,23 +82,60 @@
     return aiTerms.test(content);
   }
 
-  const posts = Array.from(document.querySelectorAll(postSelector)).map(post => ({
-    post,
-    ai: isAiPost(post),
-    ad: Array.from(post.querySelectorAll('p')).some(p => p.textContent.trim() === 'Anzeige'
-      && !p.closest('[componentkey^="replaceableComment"], [id^="replaceableComment"]'))
-  }));
+  const posts = Array.from(document.querySelectorAll(postSelector)).map(post => {
+    // Saved feed slots use display: contents, so give each one a box that can collapse.
+    const slot = post.closest('[data-lazy-mount-id]') || post;
+    const shell = document.createElement('div');
+    shell.className = 'feed-filter-slot';
+    slot.before(shell);
+    shell.appendChild(slot);
+    return {
+      post, shell, hidden: false, animation: null,
+      ai: isAiPost(post),
+      ad: Array.from(post.querySelectorAll('p')).some(p => p.textContent.trim() === 'Anzeige'
+        && !p.closest('[componentkey^="replaceableComment"], [id^="replaceableComment"]'))
+    };
+  });
+  let visiblePostCount = 0;
 
-  function applyFilter() {
+  function transitionPost(entry, hidden, animate) {
+    if (entry.hidden === hidden) return;
+    entry.hidden = hidden;
+    const {shell} = entry;
+    const startHeight = shell.getBoundingClientRect().height;
+    const startOpacity = parseFloat(getComputedStyle(shell).opacity);
+    if (entry.animation) entry.animation.cancel();
+    entry.animation = null;
+    shell.removeAttribute('data-ki-filter-hidden');
+    if (!animate || reducedMotion.matches) {
+      shell.toggleAttribute('data-ki-filter-hidden', hidden);
+      return;
+    }
+    const fullHeight = shell.getBoundingClientRect().height;
+    const animation = shell.animate([
+      {height: `${startHeight}px`, opacity: startHeight ? startOpacity : 0,
+        transform: startHeight ? 'translateY(0)' : 'translateY(-12px)'},
+      {height: hidden ? '0px' : `${fullHeight}px`, opacity: hidden ? 0 : 1,
+        transform: hidden ? 'translateY(-12px)' : 'translateY(0)'}
+    ], {duration: 560, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'both'});
+    entry.animation = animation;
+    animation.onfinish = () => {
+      if (entry.animation !== animation) return;
+      shell.toggleAttribute('data-ki-filter-hidden', entry.hidden);
+      animation.cancel();
+      entry.animation = null;
+    };
+  }
+
+  function applyFilter(animate = false) {
     toggle.setAttribute('aria-checked', String(showAiPosts));
     adsToggle.setAttribute('aria-checked', String(showAds));
     let visibleCount = 0;
-    posts.forEach(({post, ai, ad}) => {
+    posts.forEach(entry => {
+      const {ai, ad} = entry;
       const hidden = (!showAiPosts && ai) || (!showAds && ad);
       if (!hidden) visibleCount += 1;
-      // Hide the outer feed slot too, so filtered posts leave no empty gaps.
-      const slot = post.closest('[data-lazy-mount-id]') || post;
-      slot.toggleAttribute('data-ki-filter-hidden', hidden);
+      transitionPost(entry, hidden, animate);
     });
     status.textContent = showAiPosts
       ? 'KI-Beiträge werden angezeigt.'
@@ -107,18 +144,19 @@
     const countText = `${visibleCount}/${posts.length} Beiträgen`;
     document.getElementById('ki-filter-count').textContent = countText;
     document.getElementById('ads-filter-count').textContent = countText;
+    visiblePostCount = visibleCount;
     return visibleCount;
   }
 
   function changeFilter(kind) {
-    const before = applyFilter();
+    const before = visiblePostCount;
     if (kind === 'ai') showAiPosts = !showAiPosts;
     else showAds = !showAds;
     try {
       localStorage.setItem(storageKey, String(showAiPosts));
       localStorage.setItem(adsStorageKey, String(showAds));
     } catch (_) { /* Storage is optional. */ }
-    const after = applyFilter();
+    const after = applyFilter(true);
     const showing = kind === 'ai' ? showAiPosts : showAds;
     if (showing) dismissCelebration();
     else celebrate(kind, before - after);
