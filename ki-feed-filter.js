@@ -8,13 +8,60 @@
   if (!toggle || !status) return;
 
   const storageKey = 'linkedin-experiment-show-ai-posts';
-  const toast = document.createElement('div');
-  toast.className = 'ki-filter-toast';
-  toast.setAttribute('role', 'status');
-  toast.setAttribute('aria-live', 'polite');
-  toast.setAttribute('aria-atomic', 'true');
-  document.body.appendChild(toast);
-  let toastTimer;
+  const celebration = document.createElement('div');
+  celebration.className = 'feed-celebration';
+  const confetti = document.createElement('div');
+  confetti.className = 'feed-confetti';
+  confetti.setAttribute('aria-hidden', 'true');
+  const message = document.createElement('div');
+  message.className = 'feed-celebration-message';
+  message.setAttribute('role', 'status');
+  message.setAttribute('aria-live', 'polite');
+  message.setAttribute('aria-atomic', 'true');
+  celebration.append(confetti, message);
+  document.body.appendChild(celebration);
+  let celebrationTimer;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function dismissCelebration() {
+    clearTimeout(celebrationTimer);
+    celebration.classList.remove('is-visible');
+    confetti.replaceChildren();
+    message.replaceChildren();
+  }
+
+  function celebrate(kind, count) {
+    dismissCelebration();
+    const title = document.createElement('h2');
+    title.textContent = kind === 'ai' ? 'AI Free Feed' : 'Ad Free Feed';
+    const detail = document.createElement('p');
+    detail.textContent = `${count} ${count === 1 ? 'Beitrag' : 'Beiträge'} ausgeblendet`;
+    message.append(title, detail);
+    if (!reducedMotion.matches) {
+      const colors = ['#0a66c2', '#65b9ff', '#ffd36b', '#ff849c', '#75d6bb', '#a594ed'];
+      const spread = Math.min(window.innerWidth * .42, 470);
+      const particles = document.createDocumentFragment();
+      for (let i = 0; i < 84; i += 1) {
+        const piece = document.createElement('span');
+        piece.className = 'feed-confetti-piece';
+        const angle = Math.random() * Math.PI * 2;
+        const distance = .35 + Math.random() * .65;
+        piece.style.setProperty('--x', `${Math.cos(angle) * spread * distance}px`);
+        piece.style.setProperty('--y', `${Math.sin(angle) * 300 * distance - 110}px`);
+        piece.style.setProperty('--rotation', `${Math.random() * 1080 - 540}deg`);
+        piece.style.setProperty('--duration', `${1400 + Math.random() * 1000}ms`);
+        piece.style.setProperty('--delay', `${Math.random() * 160}ms`);
+        piece.style.backgroundColor = colors[i % colors.length];
+        if (i % 3 === 0) piece.style.borderRadius = '50%';
+        particles.appendChild(piece);
+      }
+      confetti.appendChild(particles);
+    }
+    // Restart the message animation when both switches are used in quick succession.
+    void celebration.offsetWidth;
+    celebration.classList.add('is-visible');
+    celebrationTimer = setTimeout(() => celebration.classList.remove('is-visible'), 2800);
+  }
   const postSelector = '[role="listitem"][componentkey^="update-card-focus"]';
   // Word boundaries prevent matches inside words such as "Mail" or "Kinder".
   const aiTerms = /(?:\b(?:ki|ai|chatgpt|claude|anthropic|openai|gemini|copilot|llms?|midjourney|deepseek)\b|künstlich\w*\s+intelligenz|artificial\s+intelligence|generativ\w*\s+(?:ki|ai)|machine\s+learning|large\s+language\s+models?)/iu;
@@ -72,12 +119,9 @@
       localStorage.setItem(adsStorageKey, String(showAds));
     } catch (_) { /* Storage is optional. */ }
     const after = applyFilter();
-    const percentage = posts.length ? Math.round(Math.abs(after - before) / posts.length * 100) : 0;
     const showing = kind === 'ai' ? showAiPosts : showAds;
-    clearTimeout(toastTimer);
-    toast.textContent = `${percentage} % der Beiträge ${showing ? 'eingeblendet' : 'ausgeblendet'}.`;
-    toast.classList.add('is-visible');
-    toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3000);
+    if (showing) dismissCelebration();
+    else celebrate(kind, before - after);
   }
   toggle.addEventListener('click', () => changeFilter('ai'));
   adsToggle.addEventListener('click', () => changeFilter('ads'));
@@ -113,4 +157,7 @@
 
   highlightAiTerms();
   applyFilter();
+  const filterCards = document.querySelectorAll('.ki-filter-card');
+  filterCards.forEach(card => card.classList.add('is-introduced'));
+  setTimeout(() => filterCards.forEach(card => card.classList.remove('is-introduced')), 3600);
 })();

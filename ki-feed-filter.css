@@ -73,29 +73,86 @@
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
-.ki-filter-toast {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  z-index: 10000;
-  box-sizing: border-box;
-  max-width: calc(100vw - 32px);
-  padding: 14px 20px;
-  border-radius: 8px;
-  background: #0a66c2;
-  color: #fff;
-  box-shadow: 0 4px 16px rgb(0 0 0 / 18%);
-  font: 400 14px/1.4 system-ui, sans-serif;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, 8px);
-  transition: opacity .3s ease, transform .3s ease;
+
+/* A brief light around the filters draws attention on arrival. */
+.ki-filter-card.is-introduced {
+  animation: filter-card-glow 2.6s ease-out .25s both;
 }
-.ki-filter-toast.is-visible {
+.ki-filter-card.is-introduced[aria-labelledby="ads-filter-title"] {
+  animation-delay: .55s;
+}
+@keyframes filter-card-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(10 102 194 / 0%); border-color: #dfdeda; }
+  22%, 48% {
+    border-color: #69b1f6;
+    box-shadow: 0 0 0 3px rgb(79 163 244 / 20%), 0 0 24px 3px rgb(79 163 244 / 30%);
+  }
+}
+.feed-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.feed-celebration-message {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  padding: 32px 44px;
+  border: 1px solid rgb(10 102 194 / 12%);
+  border-radius: 20px;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 12px 64px rgb(0 40 80 / 18%);
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(.96);
+  transition: opacity .3s ease, transform .3s ease, visibility .3s;
+}
+.feed-celebration.is-visible .feed-celebration-message {
   opacity: 1;
-  transform: translate(-50%, 0);
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.feed-celebration-message h2 {
+  margin: 0;
+  color: #0a66c2;
+  font-size: clamp(26px, 5vw, 38px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.8px;
+}
+.feed-celebration-message p {
+  margin: 10px 0 0;
+  color: #697480;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.feed-confetti { position: absolute; inset: 0; overflow: hidden; }
+.feed-confetti-piece {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 12px;
+  opacity: 0;
+  animation: feed-confetti-burst var(--duration) cubic-bezier(.12,.65,.4,1) var(--delay) both;
+  will-change: transform, opacity;
+}
+@keyframes feed-confetti-burst {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  8% { opacity: 1; }
+  55% { opacity: 1; transform: translate(var(--x), var(--y)) rotate(var(--rotation)); }
+  100% { opacity: 0; transform: translate(var(--x), calc(var(--y) + 210px)) rotate(calc(var(--rotation) + 180deg)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ki-filter-switch, .ki-filter-switch span, .ki-filter-toast { transition: none; }
+  .ki-filter-switch, .ki-filter-switch span, .feed-celebration-message { transition: none; }
+  .ki-filter-card.is-introduced { animation: none; border-color: #69b1f6; box-shadow: 0 0 0 2px rgb(79 163 244 / 18%); }
+  .feed-confetti-piece { animation: none; }
 }
