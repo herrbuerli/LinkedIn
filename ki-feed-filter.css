@@ -1,3 +1,37 @@
+.demo-ribbon {
+  position: fixed;
+  top: 42px;
+  left: -85px;
+  z-index: 20000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 300px;
+  padding: 10px 0 12px;
+  transform: rotate(-45deg);
+  background: #0a66c2;
+  color: #fff;
+  border-top: 1px solid rgb(255 255 255 / 30%);
+  border-bottom: 1px solid rgb(255 255 255 / 30%);
+  box-shadow: 0 3px 12px rgb(0 35 70 / 22%);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  pointer-events: none;
+}
+.demo-ribbon strong {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.demo-ribbon span {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
 .aaal5q[componentkey="6b3a6ba1-b8de-4aae-aff1-30cb9f4446a6"] a:is(
   [href="https://www.linkedin.com/company/effinger/"],
   [href="https://www.linkedin.com/company/urbane-reformer-innen/"],
